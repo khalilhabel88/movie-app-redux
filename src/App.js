@@ -1,26 +1,59 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { Component } from "react";
+import SearchFilter from "./Components/SearchFilter";
+import SearchRating from "./Components/SearchRating";
+import MovieList from "./Components/MovieList";
+import AddMovie from "./Components/AddMovie";
+import { connect } from "react-redux";
+import { searchRating } from "../src/js/actions/actionCreator";
+import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import Trailer from "./Components/trailer";
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+import "./App.css";
+
+class App extends Component {
+  render() {
+    return (
+      <Router>
+        <div className="App">
+          <div className="first">
+            <SearchFilter />
+            <AddMovie />
+          </div>
+          <SearchRating
+            className="filterstar"
+            rate={this.props.stars}
+            onClick={this.props.searchRating}
+          />
+          <Switch>
+            <Route exact path="/" component={MovieList} />
+            <Route
+              path={`/:${this.props.movies[this.props.pathindex].title}`}
+              render={() => (
+                <Trailer
+                  trailer={this.props.movies[this.props.pathindex].trailer}
+                />
+
+                
+              )}
+            />
+          </Switch>
+        </div>
+      </Router>
+    );
+  }
 }
 
-export default App;
+const mapStateToProps = state => {
+  return {
+    stars: state.star,
+    movies: state.MovieList,
+    pathindex: state.pathindex
+  };
+};
+const mapDispatchToProps = dispatch => ({
+  searchRating: rating => {
+    dispatch(searchRating(rating));
+  }
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(App);
